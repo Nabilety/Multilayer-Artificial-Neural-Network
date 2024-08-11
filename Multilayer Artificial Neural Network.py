@@ -275,3 +275,82 @@ epoch_loss, epoch_train_acc, epoch_valid_acc = train(model, X_train, y_train, X_
 # If we find that it increasingly tends to overfit the training data (noticeable by an increasing gap between
 # training and validation dataset performance), we may want to stop the training early, as well.
 
+
+# ## Evaluating the neural network performance
+# in train() we collected training loss and training validation accuracy for each epoch
+# so that we can visualize the results using matplotlib.
+
+# Plot of training MSE loss:
+plt.plot(range(len(epoch)), epoch_loss)
+plt.ylabel('Mean squared error')
+plt.xlabel('Epoch')
+plt.show()
+
+# loss is decreased substantially during first 10 epochs, and seems to slowly converge in the last 10 epochs
+# However the small slope between epoch 40 and 50 indicates  that the loss would further decrease with training over
+# additional epochs.
+
+# Training and validation accuracy:
+plt.plot(range(len(epoch_train_acc)), epoch_train_acc, label='Training')
+plt.plot(range(len(epoch_valid_acc)), epoch_valid_acc, label='Validation')
+plt.ylabel('Accuracy')
+plt.xlabel('Epochs')
+plt.legend(loc='lower right')
+plt.show()
+
+# preceding code examples plot those accuracy values over the 50 training epochs
+# plot reveals that the gap between training and validation accuracy increases as we train for more epochs
+# At approx. the 25th epoch, the training and validation accuracy values are almost equal and then the
+# network starts to slightly overfit the training data.
+
+# One way to decrease the effect of overfitting is to increase the regularization strength via L2 regularization
+# Another useful technique for tackling overfitting in NNs is dropout
+
+# Finally evaluate the generalization performance of the model by calculating the prediction accuracy on the test dataset:
+test_mse, test_acc = compute_mse_and_acc(model, X_test, y_test)
+print(f'Test accuracy: {test_acc*100:.2f}%')
+
+# We can see the test accuracy is very close to the validation set accuracy corresponding to the last epoch (94.74%).
+# Moreover the respective training accuracy is only minimally higher at 95.59%, reaffirming that our model only
+# slightly overfits the training data.
+
+# To further fine-tune the model, we could change the number of hidden units, the learning rate or use various other
+# tricks that have been developer over the years but are beyond the scope of this book.
+
+# Additional performance-enhancing tricks such as adaptive learning rates, more sophisticated SGD-based optimization
+# algorithms, batch normalization and dropout.
+# Other common tricks beyond the scope of the following chapters include:
+# - Adding skip-connection which are the main contribution of residual NNs
+# - Using learning rate schedulers that change the learning rate during training
+# - Attaching loss functions to earlier layers in the networks
+
+
+# Lastly we take a look at images that our MLP struggles with by extracting and plotting
+# the first 25 misclassified samples from the test set:
+X_test_subset = X_test[:1000, :]
+y_test_subset = y_test[:1000]
+_, probas = model.forward(X_test_subset)
+test_pred = np.argmax(probas, axis=1)
+misclassified_images = X_test_subset[y_test_subset != test_pred][:25]
+misclassified_labels = test_pred[y_test_subset != test_pred][:25]
+correct_labels = y_test_subset[y_test_subset != test_pred][:25]
+
+fig, ax = plt.subplots(nrows=5, ncols=5, sharex=True, sharey=True, figsize=(8, 8))
+ax = ax.flatten()
+for i in range(25):
+    img = misclassified_images[i].reshape(28, 28)
+    ax[i].imshow(img, cmap='Greys', interpolation='nearest')
+    ax[i].set_title(f'{i+1}) '
+                    f'True: {correct_labels[i]}\n'
+                    f' Predicted: {misclassified_labels[i]}')
+ax[0].set_xticks([])
+ax[0].set_yticks([])
+plt.tight_layout()
+plt.show()
+
+# We should now see a 5x5 subplot matrix where the first number in the subtitles indicates the plot index
+# the second number represents the true class label (True), the third number stand for predicted class label (Predicted):
+# As seen the network finds 7s challenging, when they include a horizontal line as in  examples 19 and 20.
+# Looking back at an earlier figure in this chapter where we plotted different training examples of the number 7,
+# we can hypothesize that the handwritten digit 7 with a horizontal line is underrepresented in our dataset and often misclassified
+
