@@ -350,7 +350,7 @@ plt.show()
 
 # We should now see a 5x5 subplot matrix where the first number in the subtitles indicates the plot index
 # the second number represents the true class label (True), the third number stand for predicted class label (Predicted):
-# As seen the network finds 7s challenging, when they include a horizontal line as in  examples 19 and 20.
+# As seen the network finds 7s challenging, among other numbers, when they include a horizontal line as in  examples 19 and 20.
 # Looking back at an earlier figure in this chapter where we plotted different training examples of the number 7,
 # we can hypothesize that the handwritten digit 7 with a horizontal line is underrepresented in our dataset and often misclassified
 
